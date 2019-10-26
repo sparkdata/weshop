@@ -26,7 +26,9 @@ public class StorageService extends BaseService<Storage> implements IStorageServ
 
     @Override
     public Storage queryByKey(String key) {
-        return storageMapper.selectOne(new Storage().setKey(key));
+        Storage storage = new Storage();
+        storage.setKey(key);
+        return storageMapper.selectOne(storage);
     }
 
     @Override

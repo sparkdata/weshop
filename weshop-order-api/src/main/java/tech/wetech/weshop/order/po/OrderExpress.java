@@ -1,8 +1,11 @@
 package tech.wetech.weshop.order.po;
 
+import lombok.Data;
+
 import javax.persistence.*;
 import java.util.Date;
 
+@Data
 @Table(name = "weshop_order_express")
 public class OrderExpress {
     @Id
@@ -65,111 +68,4 @@ public class OrderExpress {
     @Column(name = "update_time")
     private Date updateTime;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public OrderExpress setId(Integer id) {
-        this.id = id;
-        return this;
-    }
-
-    public Integer getOrderId() {
-        return orderId;
-    }
-
-    public OrderExpress setOrderId(Integer orderId) {
-        this.orderId = orderId;
-        return this;
-    }
-
-    public Integer getShipperId() {
-        return shipperId;
-    }
-
-    public OrderExpress setShipperId(Integer shipperId) {
-        this.shipperId = shipperId;
-        return this;
-    }
-
-    public String getShipperName() {
-        return shipperName;
-    }
-
-    public OrderExpress setShipperName(String shipperName) {
-        this.shipperName = shipperName;
-        return this;
-    }
-
-    public String getShipperCode() {
-        return shipperCode;
-    }
-
-    public OrderExpress setShipperCode(String shipperCode) {
-        this.shipperCode = shipperCode;
-        return this;
-    }
-
-    public String getLogisticCode() {
-        return logisticCode;
-    }
-
-    public OrderExpress setLogisticCode(String logisticCode) {
-        this.logisticCode = logisticCode;
-        return this;
-    }
-
-    public String getTraces() {
-        return traces;
-    }
-
-    public OrderExpress setTraces(String traces) {
-        this.traces = traces;
-        return this;
-    }
-
-    public Boolean getFinish() {
-        return finish;
-    }
-
-    public OrderExpress setFinish(Boolean finish) {
-        this.finish = finish;
-        return this;
-    }
-
-    public Integer getRequestCount() {
-        return requestCount;
-    }
-
-    public OrderExpress setRequestCount(Integer requestCount) {
-        this.requestCount = requestCount;
-        return this;
-    }
-
-    public Date getRequestTime() {
-        return requestTime;
-    }
-
-    public OrderExpress setRequestTime(Date requestTime) {
-        this.requestTime = requestTime;
-        return this;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public OrderExpress setCreateTime(Date createTime) {
-        this.createTime = createTime;
-        return this;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public OrderExpress setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-        return this;
-    }
 }

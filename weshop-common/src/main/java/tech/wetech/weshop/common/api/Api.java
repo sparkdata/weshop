@@ -17,7 +17,7 @@ public interface Api<T> {
     @PostMapping(value = "/queryList")
     Result<List<T>> queryList(@RequestBody T entity);
 
-    @PostMapping("/queryByCriteria")
+    @PostMapping("/queryList")
     Result<List<T>> queryByCriteria(@RequestBody Criteria<T, Object> criteria);
 
     @PostMapping("/queryOneByCriteria")

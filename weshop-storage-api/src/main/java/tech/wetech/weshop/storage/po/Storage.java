@@ -1,8 +1,11 @@
 package tech.wetech.weshop.storage.po;
 
+import lombok.Data;
+
 import javax.persistence.*;
 import java.util.Date;
 
+@Data
 @Table(name = "weshop_storage")
 public class Storage {
     @Id
@@ -47,75 +50,4 @@ public class Storage {
     @Column(name = "update_time")
     private Date updateTime;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public Storage setId(Integer id) {
-        this.id = id;
-        return this;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public Storage setKey(String key) {
-        this.key = key;
-        return this;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Storage setName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public Storage setType(String type) {
-        this.type = type;
-        return this;
-    }
-
-    public Long getSize() {
-        return size;
-    }
-
-    public Storage setSize(Long size) {
-        this.size = size;
-        return this;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public Storage setUrl(String url) {
-        this.url = url;
-        return this;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public Storage setCreateTime(Date createTime) {
-        this.createTime = createTime;
-        return this;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public Storage setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-        return this;
-    }
 }

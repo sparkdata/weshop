@@ -115,6 +115,11 @@
 			<groupId>tech.wetech.weshop</groupId>
 			<artifactId>weshop-common</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
 	</dependencies>
 
     <profiles>

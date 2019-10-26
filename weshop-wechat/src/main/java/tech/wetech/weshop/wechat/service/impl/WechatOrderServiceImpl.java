@@ -59,10 +59,12 @@ public class WechatOrderServiceImpl implements WechatOrderService {
         List<Order> orderList = orderApi.queryByCriteria(Criteria.of(Order.class).andEqualTo(Order::getUserId, userInfo.getId()).page(orderQuery.getPageNum(), orderQuery.getPageSize())).getData();
         List<OrderListVO> orderVOList = new LinkedList<>();
         for (Order order : orderList) {
-            OrderListVO orderVO = new OrderListVO(order)
-                    .setGoodsList(orderGoodsApi.queryList(new OrderGoods().setOrderId(order.getId())).getData())
-                    .setHandleOption(new HandleOptionVO(order))
-                    .setOrderStatusText(order.getPayStatus().getName());
+            OrderListVO orderVO = new OrderListVO(order);
+            OrderGoods orderGoods = new OrderGoods();
+            orderGoods.setOrderId(order.getId());
+            orderVO.setGoodsList(orderGoodsApi.queryList(orderGoods).getData());
+            orderVO.setHandleOption(new HandleOptionVO(order));
+            orderVO.setOrderStatusText(order.getPayStatus().getName());
             orderVOList.add(orderVO);
         }
         return orderVOList;
@@ -73,21 +75,24 @@ public class WechatOrderServiceImpl implements WechatOrderService {
         Order order = Optional.ofNullable(orderApi.queryById(orderId).getData())
             .orElseThrow(() -> new WeshopWechatException(WeshopWechatResultStatus.ORDER_NOT_EXIST));
 
-        OrderDetailVO.OrderInfoVO orderInfoVO = new OrderDetailVO.OrderInfoVO(order)
-                .setOrderExpress(orderExpressApi.queryOne(new OrderExpress().setOrderId(orderId)).getData());
+        OrderDetailVO.OrderInfoVO orderInfoVO = new OrderDetailVO.OrderInfoVO(order);
+        OrderExpress orderExpress = new OrderExpress();
+        orderExpress.setOrderId(orderId);
+        orderInfoVO.setOrderExpress(orderExpressApi.queryOne(orderExpress).getData());
 
         orderInfoVO.setProvinceName(
-                regionApi.queryNameById(orderInfoVO.getProvince()).getData()
+            regionApi.queryNameById(orderInfoVO.getProvince()).getData()
         ).setCityName(
-                regionApi.queryNameById(orderInfoVO.getCity()).getData()
+            regionApi.queryNameById(orderInfoVO.getCity()).getData()
         ).setDistrictName(
-                regionApi.queryNameById(orderInfoVO.getDistrict()).getData()
+            regionApi.queryNameById(orderInfoVO.getDistrict()).getData()
         );
         orderInfoVO.setFullRegion(
-                orderInfoVO.getProvinceName() + orderInfoVO.getCityName() + orderInfoVO.getDistrictName()
+            orderInfoVO.getProvinceName() + orderInfoVO.getCityName() + orderInfoVO.getDistrictName()
         );
-
-        List<OrderGoods> orderGoodsList = orderGoodsApi.queryList(new OrderGoods().setOrderId(orderId)).getData();
+        OrderGoods orderGoods = new OrderGoods();
+        orderGoods.setOrderId(orderId);
+        List<OrderGoods> orderGoodsList = orderGoodsApi.queryList(orderGoods).getData();
 
         return new OrderDetailVO(orderInfoVO, orderGoodsList, new HandleOptionVO(order));
     }
@@ -101,13 +106,13 @@ public class WechatOrderServiceImpl implements WechatOrderService {
             throw new WeshopWechatException(WeshopWechatResultStatus.PLEASE_SELECT_SHIPPING_ADDRESS);
         }
 
+
+        Cart cart1 = new Cart();
+        cart1.setUserId(userInfo.getId());
+        cart1.setSessionId(currentClaims.getId());
+        cart1.setChecked(true);
         //获取要购买的商品
-        List<Cart> checkedGoodsList = cartApi.queryList(
-                new Cart()
-                        .setUserId(userInfo.getId())
-                        .setSessionId(currentClaims.getId())
-                        .setChecked(true)
-        ).getData();
+        List<Cart> checkedGoodsList = cartApi.queryList(cart1).getData();
         if (checkedGoodsList.isEmpty()) {
             throw new WeshopWechatException(WeshopWechatResultStatus.PLEASE_SELECT_GOODS);
         }
@@ -116,7 +121,7 @@ public class WechatOrderServiceImpl implements WechatOrderService {
         BigDecimal goodsTotalPrice = BigDecimal.ZERO;
         for (Cart cart : checkedGoodsList) {
             goodsTotalPrice = goodsTotalPrice.add(
-                    cart.getRetailPrice().multiply(new BigDecimal(cart.getNumber()))
+                cart.getRetailPrice().multiply(new BigDecimal(cart.getNumber()))
             );
         }
 
@@ -189,13 +194,13 @@ public class WechatOrderServiceImpl implements WechatOrderService {
         }
         orderGoodsApi.createBatch(orderGoodsList).orElseThrow(() -> new WeshopWechatException(WeshopWechatResultStatus.CREATE_ORDER_ERROR));
 
-//        清空购物车已购买商品
-        cartApi.delete(new Cart()
-                .setUserId(userInfo.getId())
-                .setSessionId(currentClaims.getId())
-                .setChecked(true)
-        );
 
+        Cart cart = new Cart();
+        cart.setUserId(userInfo.getId());
+        cart.setSessionId(currentClaims.getId());
+        cart.setChecked(true);
+//        清空购物车已购买商品
+        cartApi.delete(cart);
         return new OrderSubmitResultVO(order);
     }
 }

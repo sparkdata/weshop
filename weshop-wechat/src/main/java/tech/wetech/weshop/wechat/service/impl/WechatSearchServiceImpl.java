@@ -38,7 +38,9 @@ public class WechatSearchServiceImpl implements WechatSearchService {
     @Override
     public void clearHistory() {
         User userInfo = JwtHelper.getUserInfo();
-        searchHistoryApi.delete(new SearchHistory().setUserId(userInfo.getId()));
+        SearchHistory searchHistory = new SearchHistory();
+        searchHistory.setUserId(userInfo.getId());
+        searchHistoryApi.delete(searchHistory);
     }
 
     @Override

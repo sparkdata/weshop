@@ -1,10 +1,13 @@
 package tech.wetech.weshop.goods.po;
 
+import lombok.Data;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+@Data
 @Table(name = "weshop_attribute_category")
 public class AttributeCategory {
     @Id
@@ -14,31 +17,4 @@ public class AttributeCategory {
     private String name;
 
     private Boolean enabled;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public AttributeCategory setId(Integer id) {
-        this.id = id;
-        return this;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public AttributeCategory setName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    public Boolean getEnabled() {
-        return enabled;
-    }
-
-    public AttributeCategory setEnabled(Boolean enabled) {
-        this.enabled = enabled;
-        return this;
-    }
 }

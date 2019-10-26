@@ -1,12 +1,13 @@
 package tech.wetech.weshop.goods.po;
 
+import lombok.Data;
+
 import javax.persistence.*;
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-
+@Data
 @Table(name = "weshop_goods")
-public class Goods implements Serializable {
+public class Goods {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

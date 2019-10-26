@@ -42,8 +42,9 @@ public class WechatCommentServiceImpl implements WechatCommentService {
 
     @Override
     public CommentCountVO countList(CommentQuery commentQuery) {
-        Integer hasPicCount = commentApi.countIfRequirePictureList(commentQuery.setRequirePicture(true)).getData();
-        Integer allCount = commentApi.countIfRequirePictureList(commentQuery.setRequirePicture(false)).getData();
+        commentQuery.setRequirePicture(true);
+        Integer hasPicCount = commentApi.countIfRequirePictureList(commentQuery).getData();
+        Integer allCount = commentApi.countIfRequirePictureList(commentQuery).getData();
         return new CommentCountVO(allCount, hasPicCount);
     }
 }

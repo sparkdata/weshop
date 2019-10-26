@@ -1,7 +1,10 @@
 package tech.wetech.weshop.goods.po;
 
+import lombok.Data;
+
 import javax.persistence.*;
 
+@Data
 @Table(name = "weshop_goods_gallery")
 public class GoodsGallery {
     @Id
@@ -20,48 +23,4 @@ public class GoodsGallery {
     @Column(name = "sort_order")
     private Integer sortOrder;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public GoodsGallery setId(Integer id) {
-        this.id = id;
-        return this;
-    }
-
-    public Integer getGoodsId() {
-        return goodsId;
-    }
-
-    public GoodsGallery setGoodsId(Integer goodsId) {
-        this.goodsId = goodsId;
-        return this;
-    }
-
-    public String getImgUrl() {
-        return imgUrl;
-    }
-
-    public GoodsGallery setImgUrl(String imgUrl) {
-        this.imgUrl = imgUrl;
-        return this;
-    }
-
-    public String getImgDesc() {
-        return imgDesc;
-    }
-
-    public GoodsGallery setImgDesc(String imgDesc) {
-        this.imgDesc = imgDesc;
-        return this;
-    }
-
-    public Integer getSortOrder() {
-        return sortOrder;
-    }
-
-    public GoodsGallery setSortOrder(Integer sortOrder) {
-        this.sortOrder = sortOrder;
-        return this;
-    }
 }

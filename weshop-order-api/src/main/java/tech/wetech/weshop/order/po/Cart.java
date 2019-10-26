@@ -1,8 +1,11 @@
 package tech.wetech.weshop.order.po;
 
+import lombok.Data;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 
+@Data
 @Table(name = "weshop_cart")
 public class Cart {
     @Id
@@ -52,129 +55,4 @@ public class Cart {
     @Column(name = "goods_specification_name_value")
     private String goodsSpecificationNameValue;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public Cart setId(Integer id) {
-        this.id = id;
-        return this;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public Cart setUserId(Integer userId) {
-        this.userId = userId;
-        return this;
-    }
-
-    public String getSessionId() {
-        return sessionId;
-    }
-
-    public Cart setSessionId(String sessionId) {
-        this.sessionId = sessionId;
-        return this;
-    }
-
-    public Integer getGoodsId() {
-        return goodsId;
-    }
-
-    public Cart setGoodsId(Integer goodsId) {
-        this.goodsId = goodsId;
-        return this;
-    }
-
-    public String getGoodsSn() {
-        return goodsSn;
-    }
-
-    public Cart setGoodsSn(String goodsSn) {
-        this.goodsSn = goodsSn;
-        return this;
-    }
-
-    public Integer getProductId() {
-        return productId;
-    }
-
-    public Cart setProductId(Integer productId) {
-        this.productId = productId;
-        return this;
-    }
-
-    public String getGoodsName() {
-        return goodsName;
-    }
-
-    public Cart setGoodsName(String goodsName) {
-        this.goodsName = goodsName;
-        return this;
-    }
-
-    public BigDecimal getMarketPrice() {
-        return marketPrice;
-    }
-
-    public Cart setMarketPrice(BigDecimal marketPrice) {
-        this.marketPrice = marketPrice;
-        return this;
-    }
-
-    public BigDecimal getRetailPrice() {
-        return retailPrice;
-    }
-
-    public Cart setRetailPrice(BigDecimal retailPrice) {
-        this.retailPrice = retailPrice;
-        return this;
-    }
-
-    public Short getNumber() {
-        return number;
-    }
-
-    public Cart setNumber(Short number) {
-        this.number = number;
-        return this;
-    }
-
-    public String getGoodsSpecificationIds() {
-        return goodsSpecificationIds;
-    }
-
-    public Cart setGoodsSpecificationIds(String goodsSpecificationIds) {
-        this.goodsSpecificationIds = goodsSpecificationIds;
-        return this;
-    }
-
-    public Boolean getChecked() {
-        return checked;
-    }
-
-    public Cart setChecked(Boolean checked) {
-        this.checked = checked;
-        return this;
-    }
-
-    public String getListPicUrl() {
-        return listPicUrl;
-    }
-
-    public Cart setListPicUrl(String listPicUrl) {
-        this.listPicUrl = listPicUrl;
-        return this;
-    }
-
-    public String getGoodsSpecificationNameValue() {
-        return goodsSpecificationNameValue;
-    }
-
-    public Cart setGoodsSpecificationNameValue(String goodsSpecificationNameValue) {
-        this.goodsSpecificationNameValue = goodsSpecificationNameValue;
-        return this;
-    }
 }

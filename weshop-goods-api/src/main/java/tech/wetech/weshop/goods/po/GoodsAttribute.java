@@ -1,7 +1,10 @@
 package tech.wetech.weshop.goods.po;
 
+import lombok.Data;
+
 import javax.persistence.*;
 
+@Data
 @Table(name = "weshop_goods_attribute")
 public class GoodsAttribute {
     @Id
@@ -16,39 +19,4 @@ public class GoodsAttribute {
 
     private String value;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public GoodsAttribute setId(Integer id) {
-        this.id = id;
-        return this;
-    }
-
-    public Integer getGoodsId() {
-        return goodsId;
-    }
-
-    public GoodsAttribute setGoodsId(Integer goodsId) {
-        this.goodsId = goodsId;
-        return this;
-    }
-
-    public Integer getAttributeId() {
-        return attributeId;
-    }
-
-    public GoodsAttribute setAttributeId(Integer attributeId) {
-        this.attributeId = attributeId;
-        return this;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public GoodsAttribute setValue(String value) {
-        this.value = value;
-        return this;
-    }
 }

@@ -58,7 +58,10 @@ public class WechatCartServiceImpl implements WechatCartService {
     public CartResultVO getCart() {
         User userInfo = JwtHelper.getUserInfo();
         Claims currentClaims = JwtHelper.getCurrentClaims();
-        List<Cart> cartList = cartApi.queryList(new Cart().setUserId(userInfo.getId()).setSessionId(currentClaims.getId())).getData();
+        Cart query = new Cart();
+        query.setUserId(userInfo.getId());
+        query.setSessionId(currentClaims.getId());
+        List<Cart> cartList = cartApi.queryList(query).getData();
         CartResultVO.CartTotalVO cartTotalVO = new CartResultVO.CartTotalVO();
 
         Integer goodsCount = 0;
@@ -69,20 +72,20 @@ public class WechatCartServiceImpl implements WechatCartService {
             goodsCount += cart.getNumber();
             //goodsAmount = goodsAmount + retailPrice * number
             goodsAmount = goodsAmount.add(
-                    cart.getRetailPrice().multiply(new BigDecimal(cart.getNumber()))
+                cart.getRetailPrice().multiply(new BigDecimal(cart.getNumber()))
             );
             if (cart.getChecked()) {
                 checkedGoodsCount += cart.getNumber();
                 //checkedGoodsAmount = checkedGoodsAmount + retailPrice * number
                 checkedGoodsAmount = checkedGoodsAmount.add(
-                        cart.getRetailPrice().multiply(new BigDecimal(cart.getNumber())));
+                    cart.getRetailPrice().multiply(new BigDecimal(cart.getNumber())));
             }
         }
 
         cartTotalVO.setGoodsCount(goodsCount)
-                .setGoodsAmount(goodsAmount)
-                .setCheckedGoodsCount(checkedGoodsCount)
-                .setCheckedGoodsAmount(checkedGoodsAmount);
+            .setGoodsAmount(goodsAmount)
+            .setCheckedGoodsCount(checkedGoodsCount)
+            .setCheckedGoodsAmount(checkedGoodsAmount);
 
         return new CartResultVO(cartList, cartTotalVO);
     }
@@ -91,16 +94,22 @@ public class WechatCartServiceImpl implements WechatCartService {
     public void deleteCartGoods(CartGoodsDeleteVO deleteVO) {
         List<Integer> productIds = Arrays.stream(deleteVO.getProductIds().split(",")).map(Integer::valueOf).collect(Collectors.toList());
         cartApi.queryByCriteria(Criteria.of(Cart.class).fields(Cart::getId).andIn(Cart::getProductId, productIds)).getData().stream()
-                .map(Cart::getId)
-                .forEach(cartId -> cartApi.deleteById(cartId));
+            .map(Cart::getId)
+            .forEach(cartId -> cartApi.deleteById(cartId));
     }
 
     @Override
     public void checkedCartGoods(CartCheckedVO cartCheckedVO) {
         List<Integer> productIds = Arrays.stream(cartCheckedVO.getProductIds().split(",")).map(Integer::valueOf).collect(Collectors.toList());
+
         cartApi.queryByCriteria(Criteria.of(Cart.class).fields(Cart::getId).andIn(Cart::getProductId, productIds)).getData().stream()
-                .map(Cart::getId)
-                .forEach(cartId -> cartApi.updateNotNull(new Cart().setChecked(cartCheckedVO.getChecked()).setId(cartId)));
+            .map(Cart::getId)
+            .forEach(cartId -> {
+                Cart updateCart = new Cart();
+                updateCart.setChecked(cartCheckedVO.getChecked());
+                updateCart.setId(cartId);
+                cartApi.updateNotNull(updateCart);
+            });
     }
 
     @Override
@@ -113,54 +122,57 @@ public class WechatCartServiceImpl implements WechatCartService {
             //商品已下架
             throw new WeshopWechatException(WeshopWechatResultStatus.GOODS_HAVE_BEEN_TAKEN_OFF_THE_SHELVES);
         }
-        Product product = productApi.queryOne(new Product()
-                .setGoodsId(cartParamDTO.getGoodsId())
-                .setId(cartParamDTO.getProductId())
-        ).getData();
+        Product queryProduct = new Product();
+        queryProduct.setGoodsId(cartParamDTO.getGoodsId());
+        queryProduct.setId(cartParamDTO.getProductId());
+        Product product = productApi.queryOne(queryProduct).getData();
         if (product == null || product.getGoodsNumber() < cartParamDTO.getNumber()) {
             //库存不足
             throw new WeshopWechatException(WeshopWechatResultStatus.UNDER_STOCK);
         }
-        Cart cart = cartApi.queryOne(new Cart()
-                .setGoodsId(cartParamDTO.getGoodsId())
-                .setProductId(cartParamDTO.getProductId())
-        ).getData();
+        Cart query = new Cart();
+        query.setGoodsId(cartParamDTO.getGoodsId());
+        query.setProductId(cartParamDTO.getProductId());
+        Cart cart = cartApi.queryOne(query).getData();
         if (cart == null) {
             // 判断购物车中是否存在此规格商品
             List<String> goodsSpecificationValueList = new LinkedList<>();
             if (product.getGoodsSpecificationIds() != null) {
                 List<Integer> specificationIdList = Arrays.stream(product.getGoodsSpecificationIds().split("_"))
-                        .filter(id -> id.length() > 0)
-                        .map(Integer::valueOf)
-                        .collect(Collectors.toList());
+                    .filter(id -> id.length() > 0)
+                    .map(Integer::valueOf)
+                    .collect(Collectors.toList());
                 if (!specificationIdList.isEmpty()) {
                     goodsSpecificationValueList = goodsSpecificationApi.queryValueByGoodsIdAndIdIn(cartParamDTO.getGoodsId(), specificationIdList).getData();
                 }
             }
-            Cart cartData = new Cart()
-                    .setGoodsId(cartParamDTO.getGoodsId())
-                    .setProductId(cartParamDTO.getProductId())
-                    .setGoodsSn(product.getGoodsSn())
-                    .setGoodsName(goods.getName())
-                    .setListPicUrl(goods.getListPicUrl())
-                    .setNumber(cartParamDTO.getNumber().shortValue())
-                    .setSessionId(currentClaims.getId())
-                    .setUserId(userInfo.getId())
-                    .setRetailPrice(product.getRetailPrice())
-                    .setMarketPrice(product.getRetailPrice())
-                    .setGoodsSpecificationNameValue(
-                            goodsSpecificationValueList.stream()
-                                    .collect(Collectors.joining(";"))
-                    )
-                    .setGoodsSpecificationIds(product.getGoodsSpecificationIds())
-                    .setChecked(true);
+            Cart cartData = new Cart();
+            cartData.setGoodsId(cartParamDTO.getGoodsId());
+            cartData.setProductId(cartParamDTO.getProductId());
+            cartData.setGoodsSn(product.getGoodsSn());
+            cartData.setGoodsName(goods.getName());
+            cartData.setListPicUrl(goods.getListPicUrl());
+            cartData.setNumber(cartParamDTO.getNumber().shortValue());
+            cartData.setSessionId(currentClaims.getId());
+            cartData.setUserId(userInfo.getId());
+            cartData.setRetailPrice(product.getRetailPrice());
+            cartData.setMarketPrice(product.getRetailPrice());
+            cartData.setGoodsSpecificationNameValue(
+                goodsSpecificationValueList.stream()
+                    .collect(Collectors.joining(";"))
+            );
+            cartData.setGoodsSpecificationIds(product.getGoodsSpecificationIds());
+            cartData.setChecked(true);
             cartApi.create(cartData);
         } else {
             // 如果已经存在购物车中，则数量增加
             if (product.getGoodsNumber() < (cartParamDTO.getNumber() + cart.getNumber())) {
                 throw new WeshopWechatException(WeshopWechatResultStatus.UNDER_STOCK);
             }
-            cartApi.updateNotNull(new Cart().setNumber(cartParamDTO.getNumber().shortValue()).setId(cart.getId()));
+            Cart updateCart = new Cart();
+            updateCart.setNumber(cartParamDTO.getNumber().shortValue());
+            updateCart.setId(cart.getId());
+            cartApi.updateNotNull(updateCart);
         }
 
     }
@@ -171,10 +183,10 @@ public class WechatCartServiceImpl implements WechatCartService {
         User userInfo = JwtHelper.getUserInfo();
         Claims currentClaims = JwtHelper.getCurrentClaims();
         // 取得规格的信息,判断规格库存
-        Product product = productApi.queryOne(new Product()
-                .setGoodsId(cartParamDTO.getGoodsId())
-                .setId(cartParamDTO.getProductId())
-        ).getData();
+        Product queryProduct = new Product();
+        queryProduct.setGoodsId(cartParamDTO.getProductId());
+        queryProduct.setId(cartParamDTO.getProductId());
+        Product product = productApi.queryOne(queryProduct).getData();
         if (product == null || product.getGoodsNumber() < cartParamDTO.getNumber()) {
             //库存不足
             throw new WeshopWechatException(WeshopWechatResultStatus.UNDER_STOCK);
@@ -182,46 +194,46 @@ public class WechatCartServiceImpl implements WechatCartService {
         // 判断是否已经存在product_id购物车商品
         Cart cart = cartApi.queryById(cartParamDTO.getId()).getData();
         if (cart.getProductId().equals(cartParamDTO.getProductId())) {
+            Cart updateCart = new Cart();
+            updateCart.setNumber(cartParamDTO.getNumber().shortValue());
+            updateCart.setId(cartParamDTO.getId());
             // 只是更新number
-            cartApi.updateNotNull(new Cart()
-                    .setNumber(cartParamDTO.getNumber().shortValue())
-                    .setId(cartParamDTO.getId())
-            );
+            cartApi.updateNotNull(updateCart);
             return;
         }
-        Cart newCartInfo = cartApi.queryOne(
-                new Cart()
-                        .setUserId(userInfo.getId())
-                        .setSessionId(currentClaims.getId())
-                        .setGoodsId(cartParamDTO.getGoodsId())
-                        .setProductId(cartParamDTO.getProductId())
-        ).getData();
+        Cart queryCart = new Cart();
+        queryCart.setUserId(userInfo.getId());
+        queryCart.setSessionId(currentClaims.getId());
+        queryCart.setGoodsId(cartParamDTO.getGoodsId());
+        queryCart.setGoodsId(cartParamDTO.getGoodsId());
+        queryCart.setProductId(cartParamDTO.getProductId());
+        Cart newCartInfo = cartApi.queryOne(queryCart).getData();
         if (newCartInfo == null) {
             //直接更新原来的cartInfo
             // 判断购物车中是否存在此规格商品
             List<String> goodsSpecificationValueList = new LinkedList<>();
             if (product.getGoodsSpecificationIds() != null) {
                 List<Integer> specificationIdList = Arrays.stream(product.getGoodsSpecificationIds()
-                        .split("_"))
-                        .filter(id -> id.length() > 0)
-                        .map(Integer::valueOf)
-                        .collect(Collectors.toList());
+                    .split("_"))
+                    .filter(id -> id.length() > 0)
+                    .map(Integer::valueOf)
+                    .collect(Collectors.toList());
                 if (!specificationIdList.isEmpty()) {
                     goodsSpecificationValueList = goodsSpecificationApi.queryValueByGoodsIdAndIdIn(cartParamDTO.getGoodsId(), specificationIdList).getData();
                 }
             }
-            Cart cartData = new Cart()
-                    .setId(cartParamDTO.getId())
-                    .setNumber(cartParamDTO.getNumber().shortValue())
-                    .setGoodsSpecificationNameValue(
-                            goodsSpecificationValueList.stream()
-                                    .collect(Collectors.joining(";"))
-                    )
-                    .setGoodsSpecificationIds(product.getGoodsSpecificationIds())
-                    .setRetailPrice(product.getRetailPrice())
-                    .setMarketPrice(product.getRetailPrice())
-                    .setProductId(cartParamDTO.getProductId())
-                    .setGoodsSn(product.getGoodsSn());
+            Cart cartData = new Cart();
+            cartData.setId(cartParamDTO.getId());
+            cartData.setNumber(cartParamDTO.getNumber().shortValue());
+            cartData.setGoodsSpecificationNameValue(
+                goodsSpecificationValueList.stream()
+                    .collect(Collectors.joining(";"))
+            );
+            cartData.setGoodsSpecificationIds(product.getGoodsSpecificationIds());
+            cartData.setRetailPrice(product.getRetailPrice());
+            cartData.setMarketPrice(product.getRetailPrice());
+            cartData.setProductId(cartParamDTO.getProductId());
+            cartData.setGoodsSn(product.getGoodsSn());
             cartApi.updateNotNull(cartData);
         } else {
             // 合并购物车已有的product信息，删除已有的数据
@@ -231,15 +243,16 @@ public class WechatCartServiceImpl implements WechatCartService {
                 throw new WeshopWechatException(WeshopWechatResultStatus.UNDER_STOCK);
             }
             cartApi.deleteById(newCartInfo.getId());
-            Cart cartData = new Cart()
-                    .setId(cartParamDTO.getId())
-                    .setNumber(newNumber.shortValue())
-                    .setGoodsSpecificationNameValue(newCartInfo.getGoodsSpecificationNameValue())
-                    .setGoodsSpecificationIds(newCartInfo.getGoodsSpecificationIds())
-                    .setRetailPrice(product.getRetailPrice())
-                    .setMarketPrice(product.getRetailPrice())
-                    .setProductId(cartParamDTO.getProductId())
-                    .setGoodsSn(product.getGoodsSn());
+            Cart cartData = new Cart();
+
+            cartData.setId(cartParamDTO.getId());
+            cartData.setNumber(newNumber.shortValue());
+            cartData.setGoodsSpecificationNameValue(newCartInfo.getGoodsSpecificationNameValue());
+            cartData.setGoodsSpecificationIds(newCartInfo.getGoodsSpecificationIds());
+            cartData.setRetailPrice(product.getRetailPrice());
+            cartData.setMarketPrice(product.getRetailPrice());
+            cartData.setProductId(cartParamDTO.getProductId());
+            cartData.setGoodsSn(product.getGoodsSn());
             cartApi.updateNotNull(cartData);
         }
 
@@ -253,29 +266,32 @@ public class WechatCartServiceImpl implements WechatCartService {
         //选择收货地址
         Address checkedAddress = null;
         if (addressId != null) {
-            checkedAddress = addressApi.queryOne(new Address()
-                    .setId(addressId)
-                    .setUserId(userInfo.getId())
-            ).getData();
+            Address queryAddress = new Address();
+            queryAddress.setId(addressId);
+            queryAddress.setUserId(userInfo.getId());
+            checkedAddress = addressApi.queryOne(queryAddress).getData();
         } else {
-            checkedAddress = addressApi.queryOne(new Address().setUserId(1).setIsDefault(true)).getData();
+            Address queryAddress = new Address();
+            queryAddress.setUserId(userInfo.getId());
+            queryAddress.setIsDefault(true);
+            checkedAddress = addressApi.queryOne(queryAddress).getData();
         }
 
         CartCheckoutVO.CheckedAddressVO checkedAddressVO = null;
         if (checkedAddress != null) {
             checkedAddressVO = new CartCheckoutVO.CheckedAddressVO(checkedAddress)
-                    .setProvinceName(
-                            regionApi.queryNameById(checkedAddress.getProvinceId()).getData()
-                    )
-                    .setCityName(
-                            regionApi.queryNameById(checkedAddress.getCityId()).getData()
-                    )
-                    .setDistrictName(
-                            regionApi.queryNameById(checkedAddress.getDistrictId()).getData()
-                    );
+                .setProvinceName(
+                    regionApi.queryNameById(checkedAddress.getProvinceId()).getData()
+                )
+                .setCityName(
+                    regionApi.queryNameById(checkedAddress.getCityId()).getData()
+                )
+                .setDistrictName(
+                    regionApi.queryNameById(checkedAddress.getDistrictId()).getData()
+                );
 
             checkedAddressVO.setFullRegion(
-                    checkedAddressVO.getProvinceName() + checkedAddressVO.getCityName() + checkedAddressVO.getDistrictName()
+                checkedAddressVO.getProvinceName() + checkedAddressVO.getCityName() + checkedAddressVO.getDistrictName()
             );
         }
         // 根据收货地址计算运费，未实现
@@ -283,8 +299,8 @@ public class WechatCartServiceImpl implements WechatCartService {
 
         CartResultVO cartData = this.getCart();
         List<Cart> checkedGoodsList = cartData.getCartList().stream()
-                .filter(Cart::getChecked)
-                .collect(Collectors.toList());
+            .filter(Cart::getChecked)
+            .collect(Collectors.toList());
 
         // 获取可用的优惠券信息
         List<UserCoupon> userCouponList = userCouponApi.queryList(new UserCoupon() {{
@@ -297,12 +313,12 @@ public class WechatCartServiceImpl implements WechatCartService {
         //商品总价
         BigDecimal goodsTotalPrice = cartData.getCartTotal().getCheckedGoodsAmount();
         BigDecimal orderTotalPrice = cartData.getCartTotal().getCheckedGoodsAmount()
-                .add(freightPrice)
-                .subtract(couponPrice);
+            .add(freightPrice)
+            .subtract(couponPrice);
 
         //减去其它支付的金额后，要实际支付的金额
         BigDecimal actualPrice = orderTotalPrice
-                .subtract(new BigDecimal(0.00));
+            .subtract(new BigDecimal(0.00));
 
         cartCheckoutDTO.setCheckedAddress(checkedAddressVO);
         cartCheckoutDTO.setFreightPrice(freightPrice);

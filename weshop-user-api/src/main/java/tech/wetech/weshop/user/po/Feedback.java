@@ -1,10 +1,13 @@
 package tech.wetech.weshop.user.po;
 
+import lombok.Data;
+
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
 
+@Data
 @Table(name = "weshop_feedback")
 public class Feedback {
     @Id
@@ -47,120 +50,4 @@ public class Feedback {
     @Column(name = "msg_content")
     private String msgContent;
 
-    public Integer getMsgId() {
-        return msgId;
-    }
-
-    public Feedback setMsgId(Integer msgId) {
-        this.msgId = msgId;
-        return this;
-    }
-
-    public Integer getParentId() {
-        return parentId;
-    }
-
-    public Feedback setParentId(Integer parentId) {
-        this.parentId = parentId;
-        return this;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public Feedback setUserId(Integer userId) {
-        this.userId = userId;
-        return this;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public Feedback setUserName(String userName) {
-        this.userName = userName;
-        return this;
-    }
-
-    public String getUserEmail() {
-        return userEmail;
-    }
-
-    public Feedback setUserEmail(String userEmail) {
-        this.userEmail = userEmail;
-        return this;
-    }
-
-    public String getMsgTitle() {
-        return msgTitle;
-    }
-
-    public Feedback setMsgTitle(String msgTitle) {
-        this.msgTitle = msgTitle;
-        return this;
-    }
-
-    public Boolean getMsgType() {
-        return msgType;
-    }
-
-    public Feedback setMsgType(Boolean msgType) {
-        this.msgType = msgType;
-        return this;
-    }
-
-    public Boolean getMsgStatus() {
-        return msgStatus;
-    }
-
-    public Feedback setMsgStatus(Boolean msgStatus) {
-        this.msgStatus = msgStatus;
-        return this;
-    }
-
-    public Date getMsgTime() {
-        return msgTime;
-    }
-
-    public Feedback setMsgTime(Date msgTime) {
-        this.msgTime = msgTime;
-        return this;
-    }
-
-    public String getMessageImg() {
-        return messageImg;
-    }
-
-    public Feedback setMessageImg(String messageImg) {
-        this.messageImg = messageImg;
-        return this;
-    }
-
-    public Integer getOrderId() {
-        return orderId;
-    }
-
-    public Feedback setOrderId(Integer orderId) {
-        this.orderId = orderId;
-        return this;
-    }
-
-    public Boolean getMsgArea() {
-        return msgArea;
-    }
-
-    public Feedback setMsgArea(Boolean msgArea) {
-        this.msgArea = msgArea;
-        return this;
-    }
-
-    public String getMsgContent() {
-        return msgContent;
-    }
-
-    public Feedback setMsgContent(String msgContent) {
-        this.msgContent = msgContent;
-        return this;
-    }
 }

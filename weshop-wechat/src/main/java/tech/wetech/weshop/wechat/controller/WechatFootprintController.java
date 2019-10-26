@@ -37,7 +37,10 @@ public class WechatFootprintController extends BaseController {
     @PostMapping("/delete")
     public Result deleteGoodsFootprint(@NotNull Integer goodsId) {
         User userInfo = JwtHelper.getUserInfo();
-        return footprintApi.delete(new Footprint().setGoodsId(goodsId).setUserId(userInfo.getId()));
+        Footprint footprint = new Footprint();
+        footprint.setGoodsId(goodsId);
+        footprint.setUserId(userInfo.getId());
+        return footprintApi.delete(footprint);
     }
 
 }

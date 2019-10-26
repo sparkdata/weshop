@@ -28,8 +28,10 @@ public class AdminCategoryController extends BaseController {
 
     @GetMapping("/list")
     public Result<List<Category>> queryList() {
+        Category category = new Category();
+        category.setLevel(CategoryLevelEnum.L1);
         return categoryApi.queryByCriteria(Criteria.of(Category.class))
                 .addExtra("categoryLevel", Arrays.stream(CategoryLevelEnum.values()).collect(Collectors.toMap(c -> c, CategoryLevelEnum::getName)))
-                .addExtra("l1", categoryApi.queryList(new Category().setLevel(CategoryLevelEnum.L1)).getData());
+                .addExtra("l1", categoryApi.queryList(category).getData());
     }
 }

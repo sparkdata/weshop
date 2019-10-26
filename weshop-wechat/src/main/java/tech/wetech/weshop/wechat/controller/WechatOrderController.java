@@ -54,7 +54,9 @@ public class WechatOrderController extends BaseController {
      */
     @GetMapping("/express")
     public Result<OrderExpress> queryLatestExpressInfo(@NotNull Integer orderId) {
-        return orderExpressApi.queryOne(new OrderExpress().setOrderId(orderId));
+        OrderExpress orderExpress = new OrderExpress();
+        orderExpress.setOrderId(orderId);
+        return orderExpressApi.queryOne(orderExpress);
     }
 
 }

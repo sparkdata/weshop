@@ -1,8 +1,11 @@
 package tech.wetech.weshop.user.po;
 
+import lombok.Data;
+
 import javax.persistence.*;
 import java.util.Date;
 
+@Data
 @Table(name = "weshop_search_history")
 public class SearchHistory {
     @Id
@@ -26,48 +29,4 @@ public class SearchHistory {
     @Column(name = "user_id")
     private Integer userId;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public SearchHistory setId(Integer id) {
-        this.id = id;
-        return this;
-    }
-
-    public String getKeyword() {
-        return keyword;
-    }
-
-    public SearchHistory setKeyword(String keyword) {
-        this.keyword = keyword;
-        return this;
-    }
-
-    public String getFrom() {
-        return from;
-    }
-
-    public SearchHistory setFrom(String from) {
-        this.from = from;
-        return this;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public SearchHistory setCreateTime(Date createTime) {
-        this.createTime = createTime;
-        return this;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public SearchHistory setUserId(Integer userId) {
-        this.userId = userId;
-        return this;
-    }
 }

@@ -48,7 +48,9 @@ public class WechatAddressServiceImpl implements WechatAddressService {
     @Override
     public List<AddressVO> queryDetailList() {
         User userInfo = JwtHelper.getUserInfo();
-        List<Address> addressList = addressApi.queryList(new Address().setUserId(userInfo.getId())).getData();
+        Address query = new Address();
+        query.setUserId(userInfo.getId());
+        List<Address> addressList = addressApi.queryList(query).getData();
         LinkedList<AddressVO> addressDTOList = new LinkedList<>();
         for (Address address : addressList) {
             AddressVO addressDTO = new AddressVO(address)

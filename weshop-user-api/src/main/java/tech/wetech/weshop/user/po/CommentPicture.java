@@ -1,7 +1,10 @@
 package tech.wetech.weshop.user.po;
 
+import lombok.Data;
+
 import javax.persistence.*;
 
+@Data
 @Table(name = "weshop_comment_picture")
 public class CommentPicture {
     @Id
@@ -17,39 +20,4 @@ public class CommentPicture {
     @Column(name = "sort_order")
     private Boolean sortOrder;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public CommentPicture setId(Integer id) {
-        this.id = id;
-        return this;
-    }
-
-    public Integer getCommentId() {
-        return commentId;
-    }
-
-    public CommentPicture setCommentId(Integer commentId) {
-        this.commentId = commentId;
-        return this;
-    }
-
-    public String getPicUrl() {
-        return picUrl;
-    }
-
-    public CommentPicture setPicUrl(String picUrl) {
-        this.picUrl = picUrl;
-        return this;
-    }
-
-    public Boolean getSortOrder() {
-        return sortOrder;
-    }
-
-    public CommentPicture setSortOrder(Boolean sortOrder) {
-        this.sortOrder = sortOrder;
-        return this;
-    }
 }

@@ -24,21 +24,24 @@ public class WechatCollectServiceImpl implements WechatCollectService {
     public CollectAddOrDeleteResultVO addOrDelete(CollectAddOrDeleteParamVO dto) {
         User userInfo = JwtHelper.getUserInfo();
         List<Collect> data = collectApi.queryByCriteria(
-                Criteria.of(Collect.class).andEqualTo(Collect::getTypeId, dto.getTypeId())
-                        .andEqualTo(Collect::getValueId, dto.getValueId())
-                        .andEqualTo(Collect::getUserId, userInfo.getId())).getData();
+            Criteria.of(Collect.class).andEqualTo(Collect::getTypeId, dto.getTypeId())
+                .andEqualTo(Collect::getValueId, dto.getValueId())
+                .andEqualTo(Collect::getUserId, userInfo.getId())).getData();
         //添加收藏
         if (data.size() == 0) {
-            collectApi.create(new Collect()
-                    .setTypeId(dto.getTypeId())
-                    .setValueId(dto.getValueId())
-                    .setUserId(userInfo.getId()));
+            Collect collect = new Collect();
+            collect.setTypeId(dto.getTypeId());
+            collect.setValueId(dto.getValueId());
+            collect.setUserId(userInfo.getId());
+            collectApi.create(collect);
             return new CollectAddOrDeleteResultVO(true);
         } else {
-            collectApi.delete(new Collect()
-                    .setTypeId(dto.getTypeId())
-                    .setValueId(dto.getValueId())
-                    .setUserId(userInfo.getId()));
+            Collect collect = new Collect();
+            collect.setTypeId(dto.getTypeId());
+            collect.setValueId(dto.getValueId());
+            collect.setUserId(userInfo.getId());
+            collectApi.create(collect);
+            collectApi.delete(collect);
             return new CollectAddOrDeleteResultVO(false);
         }
 

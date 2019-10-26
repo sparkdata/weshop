@@ -94,8 +94,8 @@ public class WechatGoodsServiceImpl implements WechatGoodsService {
         }
         criteria.fields(Goods::getCategoryId);
         List<Integer> categoryIds = goodsApi.queryByCriteria(criteria).getData().stream()
-                .map(Goods::getCategoryId)
-                .collect(Collectors.toList());
+            .map(Goods::getCategoryId)
+            .collect(Collectors.toList());
 
         if (categoryIds.isEmpty()) {
             return GoodsResultVO.EMPTY_GOODS_RESULT;
@@ -106,8 +106,8 @@ public class WechatGoodsServiceImpl implements WechatGoodsService {
         List<CategoryFilterVO> categoryFilter = new LinkedList<CategoryFilterVO>() {{
             add(new CategoryFilterVO(0, "全部", false));
             addAll(categoryApi.queryByIdIn(parentIds).getData().stream()
-                    .map(CategoryFilterVO::new)
-                    .collect(Collectors.toList()));
+                .map(CategoryFilterVO::new)
+                .collect(Collectors.toList()));
         }};
 
         categoryFilter.forEach(categoryFilterDTO -> categoryFilterDTO.setChecked(categoryFilterDTO.getId().equals(goodsSearchQuery.getCategoryId())));
@@ -143,10 +143,10 @@ public class WechatGoodsServiceImpl implements WechatGoodsService {
             criteria.sortDesc(Goods::getId);
         }
         criteria.fields(
-                Goods::getId,
-                Goods::getName,
-                Goods::getListPicUrl,
-                Goods::getRetailPrice);
+            Goods::getId,
+            Goods::getName,
+            Goods::getListPicUrl,
+            Goods::getRetailPrice);
 
         List<Goods> goodsList = goodsApi.queryByCriteria(criteria).getData();
         return new GoodsResultVO(goodsList, categoryFilter);
@@ -157,18 +157,18 @@ public class WechatGoodsServiceImpl implements WechatGoodsService {
         List<GoodsSpecificationDTO> goodsSpecificationBOList = goodsSpecificationApi.queryGoodsDetailSpecificationByGoodsId(goodsId).getData();
 
         goodsSpecificationBOList.stream()
-                .collect(Collectors.toMap(GoodsSpecificationDTO::getSpecificationId, g -> g, (g1, g2) -> g2))
-                .forEach((k, v) -> {
-                    GoodsDetailVO.GoodsSpecificationVO goodsSpecificationVO = new GoodsDetailVO.GoodsSpecificationVO();
-                    goodsSpecificationVO.setSpecificationId(k);
-                    goodsSpecificationVO.setName(v.getName());
-                    goodsSpecificationVO.setValueList(
-                            goodsSpecificationBOList.stream()
-                                    .filter(g -> g.getSpecificationId().equals(v.getSpecificationId()))
-                                    .collect(Collectors.toList())
-                    );
-                    goodsSpecificationVOList.add(goodsSpecificationVO);
-                });
+            .collect(Collectors.toMap(GoodsSpecificationDTO::getSpecificationId, g -> g, (g1, g2) -> g2))
+            .forEach((k, v) -> {
+                GoodsDetailVO.GoodsSpecificationVO goodsSpecificationVO = new GoodsDetailVO.GoodsSpecificationVO();
+                goodsSpecificationVO.setSpecificationId(k);
+                goodsSpecificationVO.setName(v.getName());
+                goodsSpecificationVO.setValueList(
+                    goodsSpecificationBOList.stream()
+                        .filter(g -> g.getSpecificationId().equals(v.getSpecificationId()))
+                        .collect(Collectors.toList())
+                );
+                goodsSpecificationVOList.add(goodsSpecificationVO);
+            });
 
         return goodsSpecificationVOList;
     }
@@ -177,9 +177,9 @@ public class WechatGoodsServiceImpl implements WechatGoodsService {
     public List<Goods> queryListByCategoryIdIn(List<Integer> categoryIdList) {
 
         Criteria<Goods, Object> criteria = Criteria.of(Goods.class)
-                .fields(Goods::getId, Goods::getName, Goods::getListPicUrl, Goods::getRetailPrice)
-                .andIn(Goods::getCategoryId, categoryIdList)
-                .page(1, 7);
+            .fields(Goods::getId, Goods::getName, Goods::getListPicUrl, Goods::getRetailPrice)
+            .andIn(Goods::getCategoryId, categoryIdList)
+            .page(1, 7);
         return goodsApi.queryByCriteria(criteria).getData();
     }
 
@@ -189,8 +189,9 @@ public class WechatGoodsServiceImpl implements WechatGoodsService {
         GoodsDetailVO goodsDetailDTO = new GoodsDetailVO();
 
         Goods goods = ofNullable(goodsApi.queryById(id)).map(Result::getData).orElseThrow(() -> new WeshopWechatException(CommonResultStatus.RECORD_NOT_EXIST));
-
-        List<GoodsGallery> goodsGalleryVOList = goodsGalleryApi.queryList(new GoodsGallery().setGoodsId(id)).getData();
+        GoodsGallery goodsGallery = new GoodsGallery();
+        goodsGallery.setGoodsId(id);
+        List<GoodsGallery> goodsGalleryVOList = goodsGalleryApi.queryList(goodsGallery).getData();
         List<GoodsAttributeDTO> goodsAttributeVOList = goodsAttributeApi.queryGoodsDetailAttributeByGoodsId(id).getData();
         List<GoodsIssue> goodsIssueList = goodsIssueApi.queryAll().getData();
         Brand brand = brandApi.queryById(goods.getBrandId()).getData();
@@ -202,9 +203,11 @@ public class WechatGoodsServiceImpl implements WechatGoodsService {
             GoodsDetailVO.CommentVO.CommentDataVO commentData = new GoodsDetailVO.CommentVO.CommentDataVO();
             String content = new String(Base64.getDecoder().decode(hotComment.getContent()));
             User user = userApi.queryById(hotComment.getUserId()).getData();
-            List<String> picList = commentPictureApi.queryList(new CommentPicture().setCommentId(hotComment.getId())).getData().stream()
-                    .map(CommentPicture::getPicUrl)
-                    .collect(Collectors.toList());
+            CommentPicture commentPicture = new CommentPicture();
+            commentPicture.setCommentId(hotComment.getId());
+            List<String> picList = commentPictureApi.queryList(commentPicture).getData().stream()
+                .map(CommentPicture::getPicUrl)
+                .collect(Collectors.toList());
 
             commentData.setContent(content);
             commentData.setNickname(user.getNickname());
@@ -215,7 +218,9 @@ public class WechatGoodsServiceImpl implements WechatGoodsService {
         }
 
         List<GoodsDetailVO.GoodsSpecificationVO> goodsSpecificationVOList = this.queryGoodsDetailSpecificationByGoodsId(id);
-        List<Product> productList = productApi.queryList(new Product().setGoodsId(id)).getData();
+        Product product = new Product();
+        product.setGoodsId(id);
+        List<Product> productList = productApi.queryList(product).getData();
 
         goodsDetailDTO.setGoods(goods);
 
@@ -232,17 +237,18 @@ public class WechatGoodsServiceImpl implements WechatGoodsService {
         goodsDetailDTO.setUserHasCollect(userCollect.size() > 0 ? true : false);
 
         //记录用户足迹 此处使用异步处理
-        Footprint footprint = new Footprint()
-                .setUserId(userInfo.getId())
-                .setGoodsId(id);
+        Footprint footprint = new Footprint();
+        footprint.setUserId(userInfo.getId());
+        footprint.setGoodsId(id);
         amqpTemplate.convertAndSend("weshop.topic.footprint", footprint);
         return goodsDetailDTO;
     }
 
     @Override
     public List<GoodsListVO> queryRelatedGoods(Integer goodsId) {
-
-        List<RelatedGoods> relatedGoodsList = relatedGoodsApi.queryList(new RelatedGoods().setGoodsId(goodsId)).getData();
+        RelatedGoods relatedGoods = new RelatedGoods();
+        relatedGoods.setGoodsId(goodsId);
+        List<RelatedGoods> relatedGoodsList = relatedGoodsApi.queryList(relatedGoods).getData();
         List<GoodsListVO> goodsList = null;
 
         if (relatedGoodsList.isEmpty()) {
@@ -250,16 +256,16 @@ public class WechatGoodsServiceImpl implements WechatGoodsService {
             Goods goods = goodsApi.queryById(goodsId).getData();
 
             goodsList = goodsApi.queryByCriteria(Criteria.of(Goods.class).andEqualTo(Goods::getCategoryId, goods.getCategoryId()).page(1, 8)).getData().stream()
-                    .map(GoodsListVO::new)
-                    .collect(Collectors.toList());
+                .map(GoodsListVO::new)
+                .collect(Collectors.toList());
         } else {
             List<Integer> goodsIdList = relatedGoodsList.stream()
-                    .map(RelatedGoods::getGoodsId)
-                    .collect(Collectors.toList());
+                .map(RelatedGoods::getGoodsId)
+                .collect(Collectors.toList());
 
             goodsList = goodsApi.queryByCriteria(Criteria.of(Goods.class).andIn(Goods::getId, goodsIdList).page(1, 8)).getData().stream()
-                    .map(GoodsListVO::new)
-                    .collect(Collectors.toList());
+                .map(GoodsListVO::new)
+                .collect(Collectors.toList());
         }
         return goodsList;
     }
@@ -270,7 +276,9 @@ public class WechatGoodsServiceImpl implements WechatGoodsService {
             .map(Result::getData)
             .orElseThrow(() -> new WeshopWechatException(CommonResultStatus.RECORD_NOT_EXIST));
         Category parentCategory = categoryApi.queryById(currentCategory.getParentId()).getData();
-        List<Category> brotherCategory = categoryApi.queryList(new Category().setParentId(currentCategory.getParentId())).getData();
+        Category category = new Category();
+        category.setParentId(currentCategory.getParentId());
+        List<Category> brotherCategory = categoryApi.queryList(category).getData();
         return new GoodsCategoryVO(currentCategory, parentCategory, brotherCategory);
     }
 

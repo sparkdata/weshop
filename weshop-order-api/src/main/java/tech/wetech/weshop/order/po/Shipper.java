@@ -1,7 +1,10 @@
 package tech.wetech.weshop.order.po;
 
+import lombok.Data;
+
 import javax.persistence.*;
 
+@Data
 @Table(name = "weshop_shipper")
 public class Shipper {
     @Id
@@ -24,39 +27,4 @@ public class Shipper {
     @Column(name = "sort_order")
     private Integer sortOrder;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public Shipper setId(Integer id) {
-        this.id = id;
-        return this;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Shipper setName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public Shipper setCode(String code) {
-        this.code = code;
-        return this;
-    }
-
-    public Integer getSortOrder() {
-        return sortOrder;
-    }
-
-    public Shipper setSortOrder(Integer sortOrder) {
-        this.sortOrder = sortOrder;
-        return this;
-    }
 }

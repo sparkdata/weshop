@@ -20,7 +20,9 @@ public class WechatRegionController extends BaseController {
 
     @GetMapping("/list")
     public Result<List<Region>> queryList(Short parentId) {
-        return regionApi.queryList(new Region().setParentId(parentId));
+        Region region = new Region();
+        region.setParentId(parentId);
+        return regionApi.queryList(region);
     }
 
 }
