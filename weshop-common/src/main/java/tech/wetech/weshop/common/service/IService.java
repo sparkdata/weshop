@@ -1,6 +1,6 @@
 package tech.wetech.weshop.common.service;
 
-import tech.wetech.weshop.common.utils.Criteria;
+import tech.wetech.weshop.common.query.Query;
 
 import java.util.List;
 
@@ -16,15 +16,15 @@ public interface IService<T> {
 
     List<T> queryList(T entity);
 
-    List<T> queryByCriteria(Criteria<T, Object> criteria);
+    List<T> queryByCondition(Query<T> query);
 
-    T queryOneByCriteria(Criteria<T, Object> criteria);
+    T queryOneByCondition(Query<T> query);
 
-    int countByCriteria(Criteria<T, Object> criteria);
+    int countByCondition(Query<T> query);
 
     T queryOne(T entity);
 
-    T queryById(Object id);
+    T queryById(Integer id);
 
     int create(T entity);
 
@@ -36,7 +36,7 @@ public interface IService<T> {
 
     int delete(T entity);
 
-    int deleteById(Object id);
+    int deleteById(Integer id);
 
     int count(T entity);
 

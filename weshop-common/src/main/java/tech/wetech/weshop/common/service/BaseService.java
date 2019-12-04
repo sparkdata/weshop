@@ -3,9 +3,13 @@ package tech.wetech.weshop.common.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import tech.wetech.weshop.common.utils.Criteria;
-import tech.wetech.weshop.common.utils.MyMapper;
+import tech.wetech.mybatis.example.Example;
+import tech.wetech.mybatis.example.MapperExample;
+import tech.wetech.mybatis.example.Sort;
+import tech.wetech.weshop.common.mapper.MyMapper;
+import tech.wetech.weshop.common.query.Query;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,7 +31,7 @@ public abstract class BaseService<T> implements IService<T> {
 
     @Override
     public List<T> queryList(T entity) {
-        return mapper.select(entity);
+        return mapper.selectList(entity);
     }
 
     @Override
@@ -36,18 +40,38 @@ public abstract class BaseService<T> implements IService<T> {
     }
 
     @Override
-    public T queryById(Object id) {
+    public T queryById(Integer id) {
         return mapper.selectByPrimaryKey(id);
     }
 
-    @Override
-    public List<T> queryByCriteria(Criteria<T, Object> criteria) {
-        return mapper.selectBySql(criteria.buildSql());
+    private Example<T> toExample(Query<T> query) {
+        MapperExample<T> example = mapper.createExample();
+        example.setColumns(query.getSelects().toArray(new String[query.getSelects().size()]));
+        if (query.getPageSize() != null && query.getPageNumber() != null) {
+            example.setPage(query.getPageSize(), query.getPageNumber());
+        }
+        List<Sort.Order> orders = new ArrayList<>();
+        for (Query.Sort.Order order : query.getSort().getOrders()) {
+            if (order.getDirection() == Query.Sort.Direction.ASC) {
+                orders.add(new Sort.Order(Sort.Direction.ASC, order.getProperty()));
+            }
+            if (order.getDirection() == Query.Sort.Direction.DESC) {
+                orders.add(new Sort.Order(Sort.Direction.DESC, order.getProperty()));
+            }
+        }
+        example.setSort(new Sort(orders));
+        return example;
+
     }
 
     @Override
-    public T queryOneByCriteria(Criteria<T, Object> criteria) {
-        List<T> ts = mapper.selectBySql(criteria.buildSql());
+    public List<T> queryByCondition(Query<T> query) {
+        return mapper.selectByExample(toExample(query));
+    }
+
+    @Override
+    public T queryOneByCondition(Query<T> query) {
+        List<T> ts = mapper.selectByExample(toExample(query));
         if (ts.size() == 0) {
             return null;
         }
@@ -55,8 +79,8 @@ public abstract class BaseService<T> implements IService<T> {
     }
 
     @Override
-    public int countByCriteria(Criteria<T, Object> criteria) {
-        return mapper.countBySql(criteria.buildCountSql());
+    public int countByCondition(Query<T> query) {
+        return mapper.countByExample(toExample(query));
     }
 
     @Override
@@ -66,7 +90,7 @@ public abstract class BaseService<T> implements IService<T> {
 
     @Override
     public int createBatch(List<T> list) {
-        return mapper.insertList(list);
+        return mapper.insertAll(list);
     }
 
     @Override
@@ -85,12 +109,12 @@ public abstract class BaseService<T> implements IService<T> {
     }
 
     @Override
-    public int deleteById(Object id) {
+    public int deleteById(Integer id) {
         return mapper.deleteByPrimaryKey(id);
     }
 
     @Override
     public int count(T entity) {
-        return mapper.selectCount(entity);
+        return mapper.count(entity);
     }
 }

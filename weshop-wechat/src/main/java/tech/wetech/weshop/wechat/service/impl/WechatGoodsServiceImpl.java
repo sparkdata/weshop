@@ -4,7 +4,7 @@ import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tech.wetech.weshop.common.enums.CommonResultStatus;
-import tech.wetech.weshop.common.utils.Criteria;
+import tech.wetech.weshop.common.query.Query;
 import tech.wetech.weshop.common.utils.Result;
 import tech.wetech.weshop.goods.api.*;
 import tech.wetech.weshop.goods.dto.GoodsAttributeDTO;
@@ -75,25 +75,25 @@ public class WechatGoodsServiceImpl implements WechatGoodsService {
     @Override
     public GoodsResultVO queryList(GoodsSearchQuery goodsSearchQuery) {
         //没传分类id就查全部
-        Criteria<Goods, Object> criteria = Criteria.of(Goods.class);
+        Query<Goods> query = new Query<>();
         if (goodsSearchQuery.getCategoryId() == null) {
             goodsSearchQuery.setCategoryId(0);
         }
         if (goodsSearchQuery.getBrandId() != null) {
 
-            criteria.andEqualTo(Goods::getBrandId, goodsSearchQuery.getBrandId());
+            query.andEqualTo(Goods::getBrandId, goodsSearchQuery.getBrandId());
         }
         if (goodsSearchQuery.getKeyword() != null) {
-            criteria.andLike(Goods::getName, "%" + goodsSearchQuery.getKeyword() + "%");
+            query.andLike(Goods::getName, "%" + goodsSearchQuery.getKeyword() + "%");
         }
         if (goodsSearchQuery.getNewly() != null) {
-            criteria.andEqualTo(Goods::getNewly, goodsSearchQuery.getNewly());
+            query.andEqualTo(Goods::getNewly, goodsSearchQuery.getNewly());
         }
         if (goodsSearchQuery.getHot() != null) {
-            criteria.andEqualTo(Goods::getHot, goodsSearchQuery.getHot());
+            query.andEqualTo(Goods::getHot, goodsSearchQuery.getHot());
         }
-        criteria.fields(Goods::getCategoryId);
-        List<Integer> categoryIds = goodsApi.queryByCriteria(criteria).getData().stream()
+        query.setSelects(Goods::getCategoryId);
+        List<Integer> categoryIds = goodsApi.queryByCondition(query).getData().stream()
             .map(Goods::getCategoryId)
             .collect(Collectors.toList());
 
@@ -117,7 +117,7 @@ public class WechatGoodsServiceImpl implements WechatGoodsService {
             List<Integer> idList = new LinkedList<>();
             idList.add(goodsSearchQuery.getCategoryId());
             idList.addAll(Optional.ofNullable(categoryApi.queryIdsByParentId(goodsSearchQuery.getCategoryId()).getData()).orElse(Collections.EMPTY_LIST));
-            criteria.andIn(Goods::getCategoryId, idList);
+            query.andIn(Goods::getCategoryId, idList);
         }
         if (goodsSearchQuery.getSort() != null) {
             String orderBy = null;
@@ -125,30 +125,31 @@ public class WechatGoodsServiceImpl implements WechatGoodsService {
                 case "price":
 //                    orderBy = "retail_price";
                     if ("desc".equals(goodsSearchQuery.getOrder())) {
-                        criteria.sortDesc(Goods::getRetailPrice);
+                        Query.Sort sort = new Query.Sort(Query.Sort.Direction.DESC, "retailPrice");
+                        query.setSort(sort);
                     } else {
-                        criteria.sort(Goods::getRetailPrice);
+                        query.setSort(new Query.Sort("retailPrice"));
                     }
                     break;
                 default:
                     orderBy = "id";
                     if ("desc".equals(goodsSearchQuery.getOrder())) {
-                        criteria.sortDesc(Goods::getId);
+                        query.setSort(new Query.Sort(Query.Sort.Direction.DESC, "id"));
                     } else {
-                        criteria.sort(Goods::getId);
+                        query.setSort(new Query.Sort("id"));
                     }
             }
         } else {
             //默认按照添加时间排序
-            criteria.sortDesc(Goods::getId);
+            query.setSort(new Query.Sort("id"));
         }
-        criteria.fields(
+        query.setSelects(
             Goods::getId,
             Goods::getName,
             Goods::getListPicUrl,
             Goods::getRetailPrice);
 
-        List<Goods> goodsList = goodsApi.queryByCriteria(criteria).getData();
+        List<Goods> goodsList = goodsApi.queryByCondition(query).getData();
         return new GoodsResultVO(goodsList, categoryFilter);
     }
 
@@ -175,12 +176,12 @@ public class WechatGoodsServiceImpl implements WechatGoodsService {
 
     @Override
     public List<Goods> queryListByCategoryIdIn(List<Integer> categoryIdList) {
-
-        Criteria<Goods, Object> criteria = Criteria.of(Goods.class)
-            .fields(Goods::getId, Goods::getName, Goods::getListPicUrl, Goods::getRetailPrice)
-            .andIn(Goods::getCategoryId, categoryIdList)
-            .page(1, 7);
-        return goodsApi.queryByCriteria(criteria).getData();
+        Query<Goods> query = new Query<>();
+        query.setSelects(Goods::getId, Goods::getName, Goods::getListPicUrl, Goods::getRetailPrice);
+        query.andIn(Goods::getCategoryId, categoryIdList);
+        query.setPageNumber(1);
+        query.setPageSize(7);
+        return goodsApi.queryByCondition(query).getData();
     }
 
     @Override
@@ -195,11 +196,13 @@ public class WechatGoodsServiceImpl implements WechatGoodsService {
         List<GoodsAttributeDTO> goodsAttributeVOList = goodsAttributeApi.queryGoodsDetailAttributeByGoodsId(id).getData();
         List<GoodsIssue> goodsIssueList = goodsIssueApi.queryAll().getData();
         Brand brand = brandApi.queryById(goods.getBrandId()).getData();
-
+        Query<Comment> query = new Query<>();
+        query.andEqualTo(Comment::getValueId, id)
+            .andEqualTo(Comment::getTypeId, 0);
         //商品评价
-        int commentCount = commentApi.countByCriteria(Criteria.of(Comment.class).andEqualTo(Comment::getValueId, id).andEqualTo(Comment::getTypeId, 0)).getData();
+        int commentCount = commentApi.countByCondition(query).getData();
         if (commentCount > 0) {
-            Comment hotComment = commentApi.queryOneByCriteria(Criteria.of(Comment.class).andEqualTo(Comment::getValueId, id).andEqualTo(Comment::getTypeId, 0).page(1, 1)).getData();
+            Comment hotComment = commentApi.queryOneByCondtion(new Query<Comment>().andEqualTo(Comment::getValueId, id).andEqualTo(Comment::getTypeId, 0).setPageSize(1).setPageNumber(1)).getData();
             GoodsDetailVO.CommentVO.CommentDataVO commentData = new GoodsDetailVO.CommentVO.CommentDataVO();
             String content = new String(Base64.getDecoder().decode(hotComment.getContent()));
             User user = userApi.queryById(hotComment.getUserId()).getData();
@@ -230,9 +233,13 @@ public class WechatGoodsServiceImpl implements WechatGoodsService {
         goodsDetailDTO.setGoodsIssueList(goodsIssueList);
         goodsDetailDTO.setGoodsSpecificationList(goodsSpecificationVOList);
         goodsDetailDTO.setProductList(productList);
-
+        Query<Collect> queryCollect = new Query<>();
+        queryCollect.andEqualTo(Collect::getUserId, userInfo.getId());
+        queryCollect.andEqualTo(Collect::getValueId, id);
+        queryCollect.setPageNumber(1);
+        queryCollect.setPageSize(1);
         //用户是否收藏
-        List<Collect> userCollect = collectApi.queryByCriteria(Criteria.of(Collect.class).andEqualTo(Collect::getUserId, userInfo.getId()).andEqualTo(Collect::getValueId, id).page(1, 1)).getData();
+        List<Collect> userCollect = collectApi.queryByCondition(queryCollect).getData();
 
         goodsDetailDTO.setUserHasCollect(userCollect.size() > 0 ? true : false);
 
@@ -254,16 +261,20 @@ public class WechatGoodsServiceImpl implements WechatGoodsService {
         if (relatedGoodsList.isEmpty()) {
             //查找同分类下的商品
             Goods goods = goodsApi.queryById(goodsId).getData();
-
-            goodsList = goodsApi.queryByCriteria(Criteria.of(Goods.class).andEqualTo(Goods::getCategoryId, goods.getCategoryId()).page(1, 8)).getData().stream()
+            Query<Goods> query = new Query<>();
+            query.andEqualTo(Goods::getCategoryId, goods.getCategoryId());
+            query.setPageNumber(1).setPageSize(8);
+            goodsList = goodsApi.queryByCondition(query).getData().stream()
                 .map(GoodsListVO::new)
                 .collect(Collectors.toList());
         } else {
             List<Integer> goodsIdList = relatedGoodsList.stream()
                 .map(RelatedGoods::getGoodsId)
                 .collect(Collectors.toList());
-
-            goodsList = goodsApi.queryByCriteria(Criteria.of(Goods.class).andIn(Goods::getId, goodsIdList).page(1, 8)).getData().stream()
+            Query<Goods> query = new Query<>();
+            query.andIn(Goods::getId, goodsIdList);
+            query.setPageNumber(1).setPageSize(8);
+            goodsList = goodsApi.queryByCondition(query).getData().stream()
                 .map(GoodsListVO::new)
                 .collect(Collectors.toList());
         }

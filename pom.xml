@@ -88,9 +88,9 @@
             </dependency>
             <!--mapper-->
             <dependency>
-                <groupId>tk.mybatis</groupId>
-                <artifactId>mapper-spring-boot-starter</artifactId>
-                <version>2.1.5</version>
+                <groupId>tech.wetech.mybatis</groupId>
+                <artifactId>mybatis-ext-spring-boot-starter</artifactId>
+                <version>1.2.0</version>
             </dependency>
             <dependency>
                 <groupId>io.springfox</groupId>

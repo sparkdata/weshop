@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import tech.wetech.weshop.common.utils.Criteria;
+import tech.wetech.weshop.common.query.Query;
 import tech.wetech.weshop.common.utils.Result;
 
 import java.util.List;
@@ -18,19 +18,19 @@ public interface Api<T> {
     Result<List<T>> queryList(@RequestBody T entity);
 
     @PostMapping("/queryList")
-    Result<List<T>> queryByCriteria(@RequestBody Criteria<T, Object> criteria);
+    Result<List<T>> queryByCondition(@RequestBody Query<T> query);
 
     @PostMapping("/queryOneByCriteria")
-    Result<T> queryOneByCriteria(@RequestBody Criteria<T, Object> criteria);
+    Result<T> queryOneByCondtion(@RequestBody Query<T> query);
 
     @PostMapping("/countByCriteria")
-    Result<Integer> countByCriteria(@RequestBody Criteria<T, Object> criteria);
+    Result<Integer> countByCondition(@RequestBody Query<T> query);
 
     @PostMapping("/queryOne")
     Result<T> queryOne(@RequestBody T entity);
 
     @GetMapping("/queryById")
-    Result<T> queryById(@RequestParam("id") Object id);
+    Result<T> queryById(@RequestParam("id") Integer id);
 
     @PostMapping("/create")
     Result<Integer> create(@RequestBody T entity);
@@ -48,7 +48,7 @@ public interface Api<T> {
     Result<Integer> delete(@RequestBody T entity);
 
     @PostMapping("/deleteById")
-    Result<Integer> deleteById(@RequestBody Object id);
+    Result<Integer> deleteById(@RequestBody Integer id);
 
     @PostMapping("/count")
     Result<Integer> count(@RequestBody T entity);

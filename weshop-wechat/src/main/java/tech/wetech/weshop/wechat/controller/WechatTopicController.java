@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tech.wetech.weshop.common.controller.BaseController;
-import tech.wetech.weshop.common.utils.Criteria;
+import tech.wetech.weshop.common.query.Query;
 import tech.wetech.weshop.common.utils.Result;
 import tech.wetech.weshop.user.api.TopicApi;
 import tech.wetech.weshop.user.po.Topic;
@@ -21,15 +21,18 @@ public class WechatTopicController extends BaseController {
 
     @GetMapping("/related")
     public Result<List<Topic>> relatedTopic() {
-        return topicApi.queryByCriteria(Criteria.of(Topic.class).page(1,4));
+        Query<Topic> query = new Query();
+        query.setPageNumber(1).setPageSize(4);
+        return topicApi.queryByCondition(query);
     }
 
     @GetMapping("/list")
     public Result<List<Topic>> list(Topic topic, Integer pageSize, Integer pageNum) {
         //FIXME 此处需要条件查询
-        Criteria<Topic, Object> criteria = Criteria.of(Topic.class).page(pageNum, pageSize);
-        return topicApi.queryByCriteria(criteria)
-                .addExtra("total", topicApi.countByCriteria(criteria));
+        Query<Topic> query = new Query();
+        query.setPageNumber(pageNum).setPageSize(pageSize);
+        return topicApi.queryByCondition(query)
+            .addExtra("total", topicApi.countByCondition(query));
     }
 
     @GetMapping

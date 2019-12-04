@@ -1,8 +1,8 @@
 package tech.wetech.weshop.common.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import tech.wetech.weshop.common.query.Query;
 import tech.wetech.weshop.common.service.IService;
-import tech.wetech.weshop.common.utils.Criteria;
 import tech.wetech.weshop.common.utils.Result;
 
 import java.util.List;
@@ -23,18 +23,18 @@ public abstract class BaseApi<T> implements Api<T> {
     }
 
     @Override
-    public Result<List<T>> queryByCriteria(Criteria<T, Object> criteria) {
-        return Result.success(service.queryByCriteria(criteria));
+    public Result<List<T>> queryByCondition(Query<T> query) {
+        return Result.success(service.queryByCondition(query));
     }
 
     @Override
-    public Result<T> queryOneByCriteria(Criteria<T, Object> criteria) {
-        return Result.success(service.queryOneByCriteria(criteria));
+    public Result<T> queryOneByCondtion(Query<T> query) {
+        return Result.success(service.queryOneByCondition(query));
     }
 
     @Override
-    public Result<Integer> countByCriteria(Criteria<T, Object> criteria) {
-        return Result.success(service.countByCriteria(criteria));
+    public Result<Integer> countByCondition(Query<T> query) {
+        return Result.success(service.countByCondition(query));
     }
 
     @Override
@@ -43,7 +43,7 @@ public abstract class BaseApi<T> implements Api<T> {
     }
 
     @Override
-    public Result<T> queryById(Object id) {
+    public Result<T> queryById(Integer id) {
         return Result.success(service.queryById(id));
     }
 
@@ -73,7 +73,7 @@ public abstract class BaseApi<T> implements Api<T> {
     }
 
     @Override
-    public Result<Integer> deleteById(Object id) {
+    public Result<Integer> deleteById(Integer id) {
         return Result.success(service.deleteById(id));
     }
 

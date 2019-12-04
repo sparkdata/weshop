@@ -2,7 +2,7 @@ package tech.wetech.weshop.wechat.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import tech.wetech.weshop.common.utils.Criteria;
+import tech.wetech.weshop.common.query.Query;
 import tech.wetech.weshop.user.api.CollectApi;
 import tech.wetech.weshop.user.dto.GoodsCollectDTO;
 import tech.wetech.weshop.user.po.Collect;
@@ -23,10 +23,11 @@ public class WechatCollectServiceImpl implements WechatCollectService {
     @Override
     public CollectAddOrDeleteResultVO addOrDelete(CollectAddOrDeleteParamVO dto) {
         User userInfo = JwtHelper.getUserInfo();
-        List<Collect> data = collectApi.queryByCriteria(
-            Criteria.of(Collect.class).andEqualTo(Collect::getTypeId, dto.getTypeId())
-                .andEqualTo(Collect::getValueId, dto.getValueId())
-                .andEqualTo(Collect::getUserId, userInfo.getId())).getData();
+        Query<Collect> query = new Query<>();
+        query.andEqualTo(Collect::getTypeId, dto.getTypeId())
+            .andEqualTo(Collect::getValueId, dto.getValueId())
+            .andEqualTo(Collect::getUserId, userInfo.getId());
+        List<Collect> data = collectApi.queryByCondition(query).getData();
         //添加收藏
         if (data.size() == 0) {
             Collect collect = new Collect();

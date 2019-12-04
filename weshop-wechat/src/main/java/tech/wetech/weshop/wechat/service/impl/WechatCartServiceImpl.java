@@ -4,7 +4,7 @@ import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tech.wetech.weshop.common.utils.Criteria;
+import tech.wetech.weshop.common.query.Query;
 import tech.wetech.weshop.goods.api.GoodsApi;
 import tech.wetech.weshop.goods.api.GoodsSpecificationApi;
 import tech.wetech.weshop.goods.api.ProductApi;
@@ -93,7 +93,9 @@ public class WechatCartServiceImpl implements WechatCartService {
     @Override
     public void deleteCartGoods(CartGoodsDeleteVO deleteVO) {
         List<Integer> productIds = Arrays.stream(deleteVO.getProductIds().split(",")).map(Integer::valueOf).collect(Collectors.toList());
-        cartApi.queryByCriteria(Criteria.of(Cart.class).fields(Cart::getId).andIn(Cart::getProductId, productIds)).getData().stream()
+        Query<Cart> query = new Query<>();
+        query.setSelects(Cart::getId).andIn(Cart::getProductId, productIds);
+        cartApi.queryByCondition(query).getData().stream()
             .map(Cart::getId)
             .forEach(cartId -> cartApi.deleteById(cartId));
     }
@@ -101,8 +103,9 @@ public class WechatCartServiceImpl implements WechatCartService {
     @Override
     public void checkedCartGoods(CartCheckedVO cartCheckedVO) {
         List<Integer> productIds = Arrays.stream(cartCheckedVO.getProductIds().split(",")).map(Integer::valueOf).collect(Collectors.toList());
-
-        cartApi.queryByCriteria(Criteria.of(Cart.class).fields(Cart::getId).andIn(Cart::getProductId, productIds)).getData().stream()
+        Query<Cart> query = new Query<>();
+        query.setSelects(Cart::getId).andIn(Cart::getProductId, productIds);
+        cartApi.queryByCondition(query).getData().stream()
             .map(Cart::getId)
             .forEach(cartId -> {
                 Cart updateCart = new Cart();

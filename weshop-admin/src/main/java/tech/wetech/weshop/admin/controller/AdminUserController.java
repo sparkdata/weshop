@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tech.wetech.weshop.common.controller.BaseController;
-import tech.wetech.weshop.common.utils.Criteria;
 import tech.wetech.weshop.common.utils.Result;
 import tech.wetech.weshop.user.api.UserApi;
 import tech.wetech.weshop.user.api.UserLevelApi;
@@ -32,9 +31,9 @@ public class AdminUserController extends BaseController {
 
     @GetMapping("/list")
     public Result<List<User>> queryList() {
-        return userApi.queryByCriteria(Criteria.of(User.class))
-                .addExtra("userLevel", userLevelApi.queryAll().getData().stream().collect(Collectors.toMap(UserLevel::getId, UserLevel::getName)))
-                .addExtra("gender", Arrays.stream(GenderEnum.values()).collect(Collectors.toMap(e -> e, GenderEnum::getName)));
+        return userApi.queryAll()
+            .addExtra("userLevel", userLevelApi.queryAll().getData().stream().collect(Collectors.toMap(UserLevel::getId, UserLevel::getName)))
+            .addExtra("gender", Arrays.stream(GenderEnum.values()).collect(Collectors.toMap(e -> e, GenderEnum::getName)));
     }
 
 }

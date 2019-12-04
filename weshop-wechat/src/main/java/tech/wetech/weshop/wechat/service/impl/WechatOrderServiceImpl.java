@@ -3,7 +3,7 @@ package tech.wetech.weshop.wechat.service.impl;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import tech.wetech.weshop.common.utils.Criteria;
+import tech.wetech.weshop.common.query.Query;
 import tech.wetech.weshop.common.utils.IdGenerator;
 import tech.wetech.weshop.order.api.CartApi;
 import tech.wetech.weshop.order.api.OrderApi;
@@ -56,7 +56,7 @@ public class WechatOrderServiceImpl implements WechatOrderService {
     @Override
     public List<OrderListVO> queryOrderList(OrderQuery orderQuery) {
         User userInfo = JwtHelper.getUserInfo();
-        List<Order> orderList = orderApi.queryByCriteria(Criteria.of(Order.class).andEqualTo(Order::getUserId, userInfo.getId()).page(orderQuery.getPageNum(), orderQuery.getPageSize())).getData();
+        List<Order> orderList = orderApi.queryByCondition(new Query<Order>().andEqualTo(Order::getUserId, userInfo.getId()).setPageNumber(orderQuery.getPageNum()).setPageSize(orderQuery.getPageSize())).getData();
         List<OrderListVO> orderVOList = new LinkedList<>();
         for (Order order : orderList) {
             OrderListVO orderVO = new OrderListVO(order);
@@ -172,7 +172,7 @@ public class WechatOrderServiceImpl implements WechatOrderService {
         orderApi.create(orderInfo).orElseThrow(() -> new WeshopWechatException(WeshopWechatResultStatus.CREATE_ORDER_ERROR));
 
 
-        Order order = orderApi.queryOneByCriteria(Criteria.of(Order.class).andEqualTo(Order::getOrderSN, orderInfo.getOrderSN())).orElseThrow(() -> new WeshopWechatException(WeshopWechatResultStatus.CREATE_ORDER_ERROR));
+        Order order = orderApi.queryOneByCondtion(new Query<Order>().andEqualTo(Order::getOrderSN, orderInfo.getOrderSN())).orElseThrow(() -> new WeshopWechatException(WeshopWechatResultStatus.CREATE_ORDER_ERROR));
 
         //统计商品总价
         List<OrderGoods> orderGoodsList = new LinkedList<>();

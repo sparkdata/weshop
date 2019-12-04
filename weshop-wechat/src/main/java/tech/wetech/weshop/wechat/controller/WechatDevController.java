@@ -31,13 +31,13 @@ public class WechatDevController {
 
   @PostMapping("{userId}/token")
   @ApiOperation("【慎用】根据id获取Token用于测试")
-  public Result<String> getTokenByUserId(@PathVariable("userId") String userId) {
-    User user = userApi.queryById(userId).getData();
-    if (user == null) {
-        throw new WeshopException(CommonResultStatus.RECORD_NOT_EXIST);
-    }
-    //生成token
-    String token = JwtHelper.createJWT("wechat", JsonUtils.toJson(user), WechatConstants.JWT_TTL);
+  public Result<String> getTokenByUserId(@PathVariable("userId") Integer userId) {
+      User user = userApi.queryById(userId).getData();
+      if (user == null) {
+          throw new WeshopException(CommonResultStatus.RECORD_NOT_EXIST);
+      }
+      //生成token
+      String token = JwtHelper.createJWT("wechat", JsonUtils.toJson(user), WechatConstants.JWT_TTL);
       return Result.success(token);
   }
 

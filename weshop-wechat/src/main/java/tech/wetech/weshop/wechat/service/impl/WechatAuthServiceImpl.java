@@ -6,7 +6,7 @@ import me.chanjar.weixin.common.error.WxErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import tech.wetech.weshop.common.utils.Criteria;
+import tech.wetech.weshop.common.query.Query;
 import tech.wetech.weshop.common.utils.EnumUtils;
 import tech.wetech.weshop.common.utils.JsonUtils;
 import tech.wetech.weshop.common.utils.WebUtil;
@@ -38,7 +38,7 @@ public class WechatAuthServiceImpl implements WechatAuthService {
         WxMaJscode2SessionResult sessionInfo = wxService.getUserService().getSessionInfo(loginAuthParamVO.getCode());
         LoginAuthParamVO.UserInfoX.UserInfo userInfo = loginAuthParamVO.getUserInfo().getUserInfo();
         //根据openId查询用户是否已经注册
-        User user = userApi.queryOneByCriteria(Criteria.of(User.class).andEqualTo(User::getWechatOpenId, sessionInfo.getOpenid())).getData();
+        User user = userApi.queryOneByCondtion(new Query<User>().andEqualTo(User::getWechatOpenId, sessionInfo.getOpenid())).getData();
         if (user == null) {
             //注册
             user = new User();
@@ -54,7 +54,7 @@ public class WechatAuthServiceImpl implements WechatAuthService {
             userApi.create(user);
         }
         //查询用户信息
-        User newUser = userApi.queryOneByCriteria(Criteria.of(User.class).andEqualTo(User::getWechatOpenId, sessionInfo.getOpenid())).getData();
+        User newUser = userApi.queryOneByCondtion(new Query<User>().andEqualTo(User::getWechatOpenId, sessionInfo.getOpenid())).getData();
         newUser.setLastLoginTime(new Date());
         newUser.setLastLoginIp(WebUtil.getInstance().getIpAddress());
         //更新登陆信息

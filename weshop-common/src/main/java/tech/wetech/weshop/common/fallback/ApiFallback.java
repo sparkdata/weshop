@@ -2,7 +2,7 @@ package tech.wetech.weshop.common.fallback;
 
 import tech.wetech.weshop.common.api.Api;
 import tech.wetech.weshop.common.enums.CommonResultStatus;
-import tech.wetech.weshop.common.utils.Criteria;
+import tech.wetech.weshop.common.query.Query;
 import tech.wetech.weshop.common.utils.Result;
 
 import java.util.List;
@@ -20,17 +20,17 @@ public abstract class ApiFallback<T> implements Api<T> {
     }
 
     @Override
-    public Result<List<T>> queryByCriteria(Criteria<T, Object> criteria) {
+    public Result<List<T>> queryByCondition(Query<T> query) {
         return Result.failure(CommonResultStatus.REMOTE_SERVICE_ERROR);
     }
 
     @Override
-    public Result<T> queryOneByCriteria(Criteria<T, Object> criteria) {
+    public Result<T> queryOneByCondtion(Query<T> query) {
         return Result.failure(CommonResultStatus.REMOTE_SERVICE_ERROR);
     }
 
     @Override
-    public Result<Integer> countByCriteria(Criteria<T, Object> criteria) {
+    public Result<Integer> countByCondition(Query<T> query) {
         return Result.failure(CommonResultStatus.REMOTE_SERVICE_ERROR);
     }
 
@@ -40,7 +40,7 @@ public abstract class ApiFallback<T> implements Api<T> {
     }
 
     @Override
-    public Result<T> queryById(Object id) {
+    public Result<T> queryById(Integer id) {
         return Result.failure(CommonResultStatus.REMOTE_SERVICE_ERROR);
     }
 
@@ -70,7 +70,7 @@ public abstract class ApiFallback<T> implements Api<T> {
     }
 
     @Override
-    public Result<Integer> deleteById(Object id) {
+    public Result<Integer> deleteById(Integer id) {
         return Result.failure(CommonResultStatus.REMOTE_SERVICE_ERROR);
     }
 

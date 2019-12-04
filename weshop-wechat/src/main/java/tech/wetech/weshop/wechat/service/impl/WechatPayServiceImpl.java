@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import tech.wetech.weshop.common.utils.Criteria;
+import tech.wetech.weshop.common.query.Query;
 import tech.wetech.weshop.common.utils.Result;
 import tech.wetech.weshop.common.utils.StringUtils;
 import tech.wetech.weshop.common.utils.WebUtil;
@@ -56,7 +56,7 @@ public class WechatPayServiceImpl implements WechatPayService {
         if (order.getPayStatus() == PayStatusEnum.PAID) {
             throw new WeshopWechatException(WeshopWechatResultStatus.ORDER_PAID);
         }
-        String wechatOpenId = userApi.queryOneByCriteria(Criteria.of(User.class).fields(User::getWechatOpenId).andEqualTo(User::getId, order.getUserId()))
+        String wechatOpenId = userApi.queryOneByCondtion(new Query<User>().setSelects(User::getWechatOpenId).andEqualTo(User::getId, order.getUserId()))
             .orElseGetData(() -> new User()).getWechatOpenId();
         //不存在openid，说明不是微信下的单
         if (StringUtils.isBlank(wechatOpenId)) {
@@ -85,7 +85,7 @@ public class WechatPayServiceImpl implements WechatPayService {
         }
         String orderSN = result.orElseGetData(() -> new WxPayOrderNotifyResult()).getOutTradeNo();
 
-        Order order = orderApi.queryOneByCriteria(Criteria.of(Order.class).andEqualTo(Order::getOrderSN, orderSN)).getData();
+        Order order = orderApi.queryOneByCondtion(new Query<Order>().andEqualTo(Order::getOrderSN, orderSN)).getData();
         if (order == null) {
             return WechatConstants.XML_PAY_ORDER_NOT_FOUND;
         }

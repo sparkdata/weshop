@@ -1,7 +1,7 @@
 package tech.wetech.weshop.goods.mapper;
 
 import org.apache.ibatis.annotations.Param;
-import tech.wetech.weshop.common.utils.MyMapper;
+import tech.wetech.weshop.common.mapper.MyMapper;
 import tech.wetech.weshop.goods.dto.GoodsSpecificationDTO;
 import tech.wetech.weshop.goods.po.GoodsSpecification;
 
