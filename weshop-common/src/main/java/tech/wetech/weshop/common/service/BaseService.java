@@ -46,7 +46,7 @@ public abstract class BaseService<T> implements IService<T> {
 
     private Example<T> toExample(Query<T> query) {
         MapperExample<T> example = mapper.createExample();
-        example.setColumns(query.getSelects().toArray(new String[query.getSelects().size()]));
+        example.setSelects(query.getSelects().toArray(new String[query.getSelects().size()]));
         if (query.getPageSize() != null && query.getPageNumber() != null) {
             example.setPage(query.getPageSize(), query.getPageNumber());
         }

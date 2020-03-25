@@ -6,7 +6,7 @@ import tech.wetech.mybatis.mapper.BaseMapper;
 /**
  * @author cjbi
  */
-public interface MyMapper<T> extends BaseMapper<T, Integer> {
+public interface MyMapper<T> extends BaseMapper<T> {
     @DeleteEntityProvider(type = MyEntitySqlBuilder.class, method = "delete")
     int delete(T entity);
 }
